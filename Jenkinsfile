@@ -8,7 +8,6 @@ pipeline {
     }
 
     stages {
-
         stage('Clone') {
             steps {
                 checkout scm
@@ -23,7 +22,15 @@ pipeline {
 
         stage('Push Docker Image') {
             steps {
-                bat 'docker push %DOCKER_USERNAME%/%IMAGE_NAME%:%IMAGE_TAG%'
+                withCredentials([usernamePassword(
+                    credentialsId: 'docker-hub-creds',
+                    usernameVariable: 'DOCKER_USER',
+                    passwordVariable: 'DOCKER_PASS'
+                )]) {
+
+                    bat 'docker login -u %DOCKER_USER% -p %DOCKER_PASS%'
+                    bat 'docker push %DOCKER_USERNAME%/%IMAGE_NAME%:%IMAGE_TAG%'
+                }
             }
         }
 
@@ -31,6 +38,12 @@ pipeline {
             steps {
                 bat 'kubectl apply -f deployment.yaml --validate=false'
             }
+        }
+    }
+
+    post {
+        always {
+            bat 'docker logout'
         }
     }
 }
