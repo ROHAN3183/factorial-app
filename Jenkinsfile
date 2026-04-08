@@ -5,6 +5,7 @@ pipeline {
         DOCKER_USERNAME = "rohan65"
         IMAGE_NAME = "factorial-app"
         IMAGE_TAG = "latest"
+        KUBECONFIG = "C:\\ProgramData\\Jenkins\\.kube\\config"
     }
 
     stages {
@@ -34,15 +35,9 @@ pipeline {
             }
         }
 
-        stage('Set Kubernetes Context') {
-            steps {
-                bat 'kubectl config use-context docker-desktop'
-            }
-        }
-
         stage('Deploy Kubernetes') {
             steps {
-                bat 'kubectl apply -f deployment.yaml --validate=false'
+                bat 'kubectl --kubeconfig=%KUBECONFIG% apply -f deployment.yaml --validate=false'
             }
         }
     }
