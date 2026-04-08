@@ -23,7 +23,7 @@ pipeline {
         stage('Push Docker Image') {
             steps {
                 withCredentials([usernamePassword(
-                    credentialsId: 'docker-cred',   // <-- FIXED
+                    credentialsId: 'docker-cred',
                     usernameVariable: 'DOCKER_USER',
                     passwordVariable: 'DOCKER_PASS'
                 )]) {
@@ -31,6 +31,12 @@ pipeline {
                     bat 'docker login -u %DOCKER_USER% -p %DOCKER_PASS%'
                     bat 'docker push %DOCKER_USERNAME%/%IMAGE_NAME%:%IMAGE_TAG%'
                 }
+            }
+        }
+
+        stage('Set Kubernetes Context') {
+            steps {
+                bat 'kubectl config use-context docker-desktop'
             }
         }
 
