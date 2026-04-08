@@ -29,7 +29,8 @@ pipeline {
 
         stage('Deploy Kubernetes') {
             steps {
-                bat 'kubectl apply -f deployment.yaml --validate=false'
+                bat 'kubectl config use-context docker-desktop'
+                bat 'kubectl apply -f deployment.yaml'
             }
         }
     }
